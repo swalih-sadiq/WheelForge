@@ -31,8 +31,8 @@ class OTPVerification(models.Model):
     purpose = models.CharField(max_length=30, choices=PURPOSE_CHOICES)
     is_verified = models.BooleanField(default=False)
     expires_at = models.DateTimeField()
-    created_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def is_expired(self):
         return timezone.now() > self.expires_at 
