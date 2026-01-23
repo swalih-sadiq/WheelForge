@@ -2,7 +2,7 @@ import random
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login
 
 from accounts.models import OTPVerification
 
@@ -94,3 +94,43 @@ def verify_otp_view(request):
         return redirect("signup")
 
     return render(request, "verify_otp.html")
+
+def login_view(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        if not email or not password:
+            messages.error(request, "All fields are required.")
+            return redirect("login")
+
+        user = authenticate(request, username=email, password=password)
+
+        if user is None:
+            messages.error(request, "Invalid email or password.")
+            return redirect("login")
+
+        if user.is_blocked:
+            messages.error(request, "Your account has been blocked.")
+            return redirect("login")
+
+        if not user.is_active:
+            # User not verified → resend OTP
+            otp = generate_otp()
+            OTPVerification.objects.create(
+                user=user,
+                otp=otp,
+                purpose="signup",
+                expires_at=OTPVerification.get_expiry_time()
+            )
+
+            print(f"LOGIN OTP RESENT for {user.email}: {otp}")
+            request.session["otp_user_id"] = user.id
+            messages.warning(request, "Account not verified. OTP resent.")
+            return redirect("verify_otp")
+
+        login(request, user)
+        messages.success(request, "Logged in successfully.")
+        return redirect("home")
+
+    return render(request, "login.html")

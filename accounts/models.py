@@ -10,7 +10,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=10, blank=True, null=True)
     auth_provider = models.CharField(max_length=20, default='email')
-    is_blocked = models.BooleanField(default=True)
+    is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
