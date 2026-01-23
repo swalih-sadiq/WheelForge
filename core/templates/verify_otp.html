@@ -8,3 +8,11 @@
 {% for message in messages %}
 <p>{{ message }}</p>
 {% endfor %}
+
+<hr>
+
+<p>Didn’t receive the OTP?</p>
+
+<a href="{% url 'resend_otp' %}">
+  <button type="button">Resend OTP</button>
+</a>
