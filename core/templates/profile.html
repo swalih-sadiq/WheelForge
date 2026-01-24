@@ -1,0 +1,19 @@
+<h2>My Profile</h2>
+
+<p><strong>Email:</strong> {{ user.email }}</p>
+<p><strong>Username:</strong> {{ user.username }}</p>
+<p><strong>Phone:</strong> {{ user.phone|default:"Not added" }}</p>
+<p><strong>Auth Provider:</strong> {{ user.auth_provider }}</p>
+<p><strong>Status:</strong>
+  {% if user.is_blocked %}
+    Blocked
+  {% else %}
+    Active
+  {% endif %}
+</p>
+
+<p><strong>Joined:</strong> {{ user.date_joined }}</p>
+
+<hr>
+
+<a href="{% url 'logout' %}">Logout</a>

@@ -4,6 +4,8 @@ from datetime import timedelta
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required 
 from django.utils import timezone
 
 
@@ -197,6 +199,19 @@ def login_view(request):
         return redirect("home")
 
     return render(request, "login.html")
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def profile_view(request):
+    user = request.user
+    return render(request, "profile.html", {"user": user})
+
+@login_required
+def logout_view(request):
+    logout(request)
+    messages.success(request, "Logged out successfully.")
+    return redirect("login")
 
 def forgot_password_view(request):
     if request.method == "POST":
