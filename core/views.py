@@ -109,8 +109,6 @@ def resend_otp_view(request):
         return redirect("login")
 
     user = User.objects.get(id=user_id)
-
-    # ⏱ Rate limit (same rule everywhere)
     recent_otp_exists = OTPVerification.objects.filter(
         user=user,
         purpose="signup",
@@ -121,7 +119,7 @@ def resend_otp_view(request):
         messages.warning(request, "Please wait before requesting a new OTP.")
         return redirect("verify_otp")
 
-    # ❗ Invalidate old OTPs
+   
     OTPVerification.objects.filter(
         user=user,
         purpose="signup",
@@ -162,7 +160,7 @@ def login_view(request):
             return redirect("login")
 
         if not user.is_active:
-            # ⏱ Rate limit OTP resend
+            # Rate limit OTP resend
             recent_otp_exists = OTPVerification.objects.filter(
                 user=user,
                 purpose="signup",
@@ -173,7 +171,7 @@ def login_view(request):
                 messages.warning(request, "Please wait before requesting a new OTP.")
                 return redirect("login")
 
-            # ❗ Invalidate all previous unverified OTPs
+            # Invalidate all previous unverified OTPs
             OTPVerification.objects.filter(
                 user=user,
                 purpose="signup",
@@ -207,6 +205,31 @@ def profile_view(request):
     user = request.user
     return render(request, "profile.html", {"user": user})
 
+
+@login_required
+def edit_profile_view(request):
+    user = request.user
+
+    if request.method == "POST":
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        phone = request.POST.get("phone", "").strip()
+
+        # Basic validation
+        if phone and len(phone) < 10:
+            messages.error(request, "Phone number must be at least 10 digits.")
+            return redirect("edit_profile")
+
+        user.first_name = first_name
+        user.last_name = last_name
+        user.phone = phone if phone else None
+        user.save()
+
+        messages.success(request, "Profile updated successfully.")
+        return redirect("profile")
+
+    return render(request, "edit_profile.html")
+
 @login_required
 def logout_view(request):
     logout(request)
@@ -224,7 +247,7 @@ def forgot_password_view(request):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            # 🔐 Security: don’t reveal user existence
+            #  Security: don’t reveal user existence
             messages.success(
                 request,
                 "If this email exists, an OTP has been sent."
@@ -235,7 +258,7 @@ def forgot_password_view(request):
             messages.error(request, "Your account has been blocked.")
             return redirect("login")
 
-        # ⏱ Rate-limit OTP
+        #  Rate-limit OTP
         recent_otp_exists = OTPVerification.objects.filter(
             user=user,
             purpose="forgot_password",
@@ -249,7 +272,7 @@ def forgot_password_view(request):
             )
             return redirect("forgot_password")
 
-        # ❗ Invalidate old forgot-password OTPs
+        #  Invalidate old forgot-password OTPs
         OTPVerification.objects.filter(
             user=user,
             purpose="forgot_password",
@@ -339,7 +362,7 @@ def reset_password_view(request):
         user.set_password(password)
         user.save()
 
-        # ✅ Cleanup
+        #  Cleanup
         OTPVerification.objects.filter(
             user=user,
             purpose="forgot_password"

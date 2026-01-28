@@ -1,0 +1,20 @@
+<form method="post">
+  {% csrf_token %}
+
+  <input name="full_name" placeholder="Full Name" value="{{ address.full_name|default:'' }}">
+  <input name="phone" placeholder="Phone" value="{{ address.phone|default:'' }}">
+
+  <input name="address_line_1" placeholder="Address Line 1" value="{{ address.address_line_1|default:'' }}">
+  <input name="address_line_2" placeholder="Address Line 2" value="{{ address.address_line_2|default:'' }}">
+
+  <input name="city" placeholder="City" value="{{ address.city|default:'' }}">
+  <input name="state" placeholder="State" value="{{ address.state|default:'' }}">
+  <input name="pincode" placeholder="Pincode" value="{{ address.pincode|default:'' }}">
+
+  <label>
+    <input type="checkbox" name="is_default" {% if address.is_default %}checked{% endif %}>
+    Set as default
+  </label>
+
+  <button type="submit">Save</button>
+</form>

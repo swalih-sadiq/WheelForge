@@ -1,0 +1,26 @@
+<h2>Edit Profile</h2>
+
+{% for message in messages %}
+  <p>{{ message }}</p>
+{% endfor %}
+
+<form method="post">
+  {% csrf_token %}
+
+  <input type="text" name="first_name"
+         placeholder="First name"
+         value="{{ request.user.first_name }}"><br><br>
+
+  <input type="text" name="last_name"
+         placeholder="Last name"
+         value="{{ request.user.last_name }}"><br><br>
+
+  <input type="text" name="phone"
+         placeholder="Phone number"
+         value="{{ request.user.phone|default_if_none:'' }}"><br><br>
+
+  <button type="submit">Save Changes</button>
+</form>
+
+<br>
+<a href="{% url 'profile' %}">Cancel</a>
