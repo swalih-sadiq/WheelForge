@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.conf import settings
 from django.utils import timezone 
 from datetime import timedelta 
 
@@ -46,7 +47,7 @@ class OTPVerification(models.Model):
     
 
 class Address(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='addresses')
     full_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=10)
     address_line_1 = models.CharField(max_length=255)
