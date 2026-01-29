@@ -27,15 +27,13 @@
     <td>
       {% if user != request.user %}
         {% if user.is_blocked %}
-          <form method="post" action="{% url 'admin-unblock-user' user.id %}">
-            {% csrf_token %}
-            <button type="submit">Unblock</button>
-          </form>
+          <a href="{% url 'admin-confirm-unblock-user' user.id %}">
+            Unblock
+          </a>
         {% else %}
-          <form method="post" action="{% url 'admin-block-user' user.id %}">
-            {% csrf_token %}
-            <button type="submit">Block</button>
-          </form>
+          <a href="{% url 'admin-confirm-block-user' user.id %}">
+            Block
+          </a>
         {% endif %}
       {% else %}
         —

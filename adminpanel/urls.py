@@ -8,5 +8,8 @@ urlpatterns = [
 
     path('users/', views.admin_user_list_view, name='admin-user-list'),
     path('users/block/<int:user_id>/', views.admin_block_user_view, name='admin-block-user'),
-    path('users/unblock/<int:user_id>/', views.admin_unblock_user_view, name='admin-unblock-user'),    
+    path('users/unblock/<int:user_id>/', views.admin_unblock_user_view, name='admin-unblock-user'),
+
+    path('users/block/<int:user_id>/confirm/', views.admin_confirm_block_user_view, name='admin-confirm-block-user'),
+    path('users/unblock/<int:user_id>/confirm/', views.admin_confirm_unblock_user_view, name='admin-confirm-unblock-user'),
 ]

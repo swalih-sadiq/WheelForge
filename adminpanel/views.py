@@ -28,7 +28,16 @@ def admin_login_view(request):
 
 @admin_required
 def admin_dashboard_view(request):
-    return render(request, 'adminpanel/dashboard.html')
+    total_users = User.objects.count()
+    blocked_users = User.objects.filter(is_blocked=True).count()
+    active_users = total_users - blocked_users 
+
+    return render(request, 'adminpanel/dashboard.html', {
+        'total_users': total_users,
+        'active_users': active_users,
+        'blocked_users': blocked_users,
+    },
+    )
 
 def admin_logout_view(request):
     logout(request)
@@ -82,3 +91,25 @@ def admin_unblock_user_view(request, user_id):
     messages.success(request, f'{user.email} has been blocked.')
     return redirect('admin-user-list')
 
+
+
+
+@admin_required
+def admin_confirm_block_user_view(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    if user ==request.user:
+        return render(request, 'errors/403.html', {
+            'title': 'Action Denied',
+            'message': 'You cannot block yourself.',
+        },
+        status=403,
+        )
+    
+    return render(request, 'adminpanel/confirm_block.html', {'target_user':user},)
+
+@admin_required
+def admin_confirm_unblock_user_view(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    return render (request, 'adminpanel/cofirm_unblock.html', {'target_user': user},)

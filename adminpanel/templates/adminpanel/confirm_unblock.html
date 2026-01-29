@@ -1,0 +1,10 @@
+<h2>Confirm Unblock</h2>
+<p>
+  Are you sure you want to unblock <strong>{{ target_user.email }}</strong>?
+</p>
+
+<form method="post" action="{% url 'admin-unblock-user' target_user.id %}">
+  {% csrf_token %}
+  <button type="submit">Yes, Unblock</button>
+  <a href="{% url 'admin-user-list' %}">Cancel</a>
+</form>

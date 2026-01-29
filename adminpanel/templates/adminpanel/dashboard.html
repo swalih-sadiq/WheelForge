@@ -1,3 +1,10 @@
 <h2>Admin Dashboard</h2>
-<p>Welcome, {{ request.user.email }}</p>
+
+<ul>
+  <li>Total users: {{ total_users }}</li>
+  <li>Active users: {{ active_users }}</li>
+  <li>Blocked users: {{ blocked_users }}</li>
+</ul>
+
+<a href="{% url 'admin-user-list' %}">Manage Users</a>
 <a href="{% url 'admin-logout' %}">Logout</a>
