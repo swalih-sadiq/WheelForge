@@ -1,0 +1,7 @@
+<h2>Admin Login</h2>
+<form method="post">
+  {% csrf_token %}
+  <input type="email" name="email" placeholder="Admin Email">
+  <input type="password" name="password" placeholder="Password">
+  <button type="submit">Login</button>
+</form>
