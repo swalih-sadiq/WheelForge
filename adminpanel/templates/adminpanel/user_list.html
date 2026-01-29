@@ -1,0 +1,58 @@
+<h2>Users</h2>
+
+<form method="get">
+  <input type="text" name="q" placeholder="Search email" value="{{ query }}">
+  <button type="submit">Search</button>
+</form>
+
+<table border="1">
+  <tr>
+    <th>Email</th>
+    <th>Auth</th>
+    <th>Status</th>
+    <th>Action</th>
+  </tr>
+
+  {% for user in page_obj %}
+  <tr>
+    <td>{{ user.email }}</td>
+    <td>{{ user.auth_provider }}</td>
+    <td>
+      {% if user.is_blocked %}
+        Blocked
+      {% else %}
+        Active
+      {% endif %}
+    </td>
+    <td>
+      {% if user != request.user %}
+        {% if user.is_blocked %}
+          <form method="post" action="{% url 'admin-unblock-user' user.id %}">
+            {% csrf_token %}
+            <button type="submit">Unblock</button>
+          </form>
+        {% else %}
+          <form method="post" action="{% url 'admin-block-user' user.id %}">
+            {% csrf_token %}
+            <button type="submit">Block</button>
+          </form>
+        {% endif %}
+      {% else %}
+        —
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<div>
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}&q={{ query }}">Prev</a>
+  {% endif %}
+
+  Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}&q={{ query }}">Next</a>
+  {% endif %}
+</div>
