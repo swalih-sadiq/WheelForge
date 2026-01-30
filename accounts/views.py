@@ -228,3 +228,7 @@ def delete_address_view(request, address_id):
 
     messages.success(request, "Address deleted.")
     return redirect("address-list")
+
+
+
+

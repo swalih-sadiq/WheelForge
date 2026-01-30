@@ -1,9 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Profile</title>
+
+  <!-- Cropper.js CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css"
+  />
+
+  <!-- Cropper.js JS -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js">
+  </script>
+</head>
+
+<body>
+
 <h2>My Profile</h2>
+
+<!-- ================= PROFILE IMAGE DISPLAY ================= -->
+{% if user.profile_image %}
+  <img
+    src="{{ user.profile_image.url }}"
+    alt="Profile Image"
+    width="120"
+    height="120"
+    style="border-radius:50%; object-fit:cover;"
+  >
+{% else %}
+  <img
+    src="{% static 'images/default-avatar.png' %}"
+    alt="Default Avatar"
+    width="120"
+    height="120"
+    style="border-radius:50%; object-fit:cover;"
+  >
+{% endif %}
+
+<!-- ================= PROFILE IMAGE UPLOAD FORM ================= -->
+<form
+  method="post"
+  enctype="multipart/form-data"
+  action="{% url 'upload-profile-image' %}"
+  id="imageForm"
+  style="margin-top:10px;"
+>
+  {% csrf_token %}
+
+  <input
+    type="file"
+    name="profile_image"
+    id="imageInput"
+    accept="image/*"
+    required
+  >
+
+  <button type="submit">Save Image</button>
+</form>
+
+<!-- ================= CROP PREVIEW CONTAINER ================= -->
+<div
+  id="cropContainer"
+  style="display:none; margin-top:15px; max-width:320px; border:1px solid #ccc; padding:10px;"
+>
+  <img id="cropImage" style="max-width:100%;">
+</div>
+
+<hr>
 
 <p><strong>Email:</strong> {{ user.email }}</p>
 <p><strong>Username:</strong> {{ user.username }}</p>
 <p><strong>Phone:</strong> {{ user.phone|default:"Not added" }}</p>
 <p><strong>Auth Provider:</strong> {{ user.auth_provider }}</p>
+
 <p><strong>Status:</strong>
   {% if user.is_blocked %}
     Blocked
@@ -20,3 +92,80 @@
 <hr>
 
 <a href="{% url 'logout' %}">Logout</a>
+
+<!-- ================= CROP SCRIPT (DOM-SAFE & GUARANTEED) ================= -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  let cropper = null;
+
+  const input = document.getElementById("imageInput");
+  const cropContainer = document.getElementById("cropContainer");
+  const cropImage = document.getElementById("cropImage");
+  const form = document.getElementById("imageForm");
+
+  // Safety checks
+  if (!input || !cropImage || !form) {
+    console.error("Cropper elements missing");
+    return;
+  }
+
+  // When user selects image
+  input.addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function () {
+      cropImage.src = reader.result;
+      cropContainer.style.display = "block";
+
+      // Destroy old cropper if exists
+      if (cropper) {
+        cropper.destroy();
+      }
+
+      cropper = new Cropper(cropImage, {
+        aspectRatio: 1,
+        viewMode: 1,
+        autoCropArea: 1,
+      });
+    };
+
+    reader.readAsDataURL(file);
+  });
+
+  // On submit → replace file with cropped version
+  form.addEventListener("submit", function (e) {
+
+    // If cropper not initialized, allow normal upload
+    if (!cropper) return;
+
+    e.preventDefault();
+
+    cropper.getCroppedCanvas({
+      width: 300,
+      height: 300,
+    }).toBlob(function (blob) {
+
+      const file = new File([blob], "profile.png", {
+        type: "image/png",
+      });
+
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+
+      input.files = dataTransfer.files;
+
+      form.submit();
+    });
+  });
+
+});
+</script>
+
+</body>
+</html>
+
+
+

@@ -10,6 +10,7 @@ from datetime import timedelta
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=10, blank=True, null=True)
+    profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     auth_provider = models.CharField(max_length=20, default='email')
     is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

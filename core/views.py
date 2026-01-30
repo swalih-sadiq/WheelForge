@@ -17,6 +17,9 @@ User = get_user_model()
 def generate_otp():
     return str(random.randint(100000, 999999))
 
+def home_view(request):
+    return render(request, 'home.html')
+
 
 def signup_view(request):
     if request.method == "POST":
@@ -198,12 +201,32 @@ def login_view(request):
 
     return render(request, "login.html")
 
-from django.contrib.auth.decorators import login_required
+
 
 @login_required
 def profile_view(request):
     user = request.user
     return render(request, "profile.html", {"user": user})
+
+
+@login_required
+def upload_profile_image_view(request):
+    if request.method == "POST":
+        image = request.FILES.get("profile_image")
+
+        if not image:
+            messages.error(request, "No image selected.")
+            return redirect("profile")
+
+        if image.size > 2 * 1024 * 1024:
+            messages.error(request, "Image too large (max 2MB).")
+            return redirect("profile")
+
+        request.user.profile_image = image
+        request.user.save()
+
+        messages.success(request, "Profile image updated.")
+        return redirect("profile")
 
 
 @login_required
