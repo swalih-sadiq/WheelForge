@@ -29,6 +29,10 @@ def clear_email_change_session(request):
 
 @login_required
 def request_email_change_view(request):
+    if request.user.auth_provider != 'email':
+        messages.error(request, 'Email change is not allowed for social login accounts.')
+        return redirect('profile')
+    
     if request.method == "POST":
         new_email = request.POST.get("email")
 

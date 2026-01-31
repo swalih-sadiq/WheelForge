@@ -1,8 +1,23 @@
 <h2>Users</h2>
 
-<form method="get">
-  <input type="text" name="q" placeholder="Search email" value="{{ query }}">
+<form method="get" style="margin-bottom: 15px;">
+  <input
+    type="text"
+    name="q"
+    placeholder="Search by email"
+    value="{{ query }}"
+  >
+
   <button type="submit">Search</button>
+
+  {% if query %}
+    <a
+      href="{% url 'admin-user-list' %}"
+      style="margin-left: 10px;"
+    >
+      Clear
+    </a>
+  {% endif %}
 </form>
 
 <table border="1">

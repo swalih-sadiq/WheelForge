@@ -72,6 +72,13 @@
 <hr>
 
 <p><strong>Email:</strong> {{ user.email }}</p>
+
+{% if user.auth_provider == "email" %}
+  <a href="{% url 'request-email-change' %}">Change Email</a>
+{% else %}
+  <p><em>Email is managed by {{ user.auth_provider|title }}.</em></p>
+{% endif %}
+
 <p><strong>Username:</strong> {{ user.username }}</p>
 <p><strong>Phone:</strong> {{ user.phone|default:"Not added" }}</p>
 <p><strong>Auth Provider:</strong> {{ user.auth_provider }}</p>
@@ -166,6 +173,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </body>
 </html>
-
-
 
