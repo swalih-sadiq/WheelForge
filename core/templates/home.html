@@ -7,57 +7,290 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{% static 'css/home.css' %}">  
 </head>
-
 <body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">WheelForge</div>
+      <ul class="nav-menu">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#shop">Shop</a></li>
+        <li><a href="#categories">Categories</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="icon-btn search-btn">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2"/>
+            <path d="M13 13L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button class="icon-btn cart-btn">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M1 1H3L3.4 3M5 11H15L17 3H3.4M5 11L3.4 3M5 11L3 15H17M17 15C17 16.1046 16.1046 17 15 17C13.8954 17 13 16.1046 13 15M17 15C17 13.8954 16.1046 13 15 13C13.8954 13 13 13.8954 13 15M7 15C7 16.1046 6.10457 17 5 17C3.89543 17 3 16.1046 3 15M7 15C7 13.8954 6.10457 13 5 13C3.89543 13 3 13.8954 3 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <a href="/login/" class="btn-login">Login</a>
+      </div>
+    </div>
+  </nav>
 
- <body>
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <h1>Precision Forged.<br>Performance Perfected.</h1>
+      <p>Premium alloy wheels built for performance and luxury.</p>
+      <div class="hero-buttons">
+        <a href="/login/" class="btn primary">Shop Wheels</a>
+        <a href="#categories" class="btn secondary">Explore Categories</a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <div class="wheel-showcase"></div>
+    </div>
+  </header>
 
-<header class="hero">
-  <h1>Precision Forged. Performance Perfected.</h1>
-  <p>Premium alloy wheels built for performance and luxury.</p>
+  <!-- Featured Products -->
+  <section class="section featured-products">
+    <div class="section-header">
+      <h2>Featured Products</h2>
+      <a href="#" class="view-all">View All →</a>
+    </div>
+    <div class="product-grid">
+      <div class="product-card">
+        <div class="product-image">
+          <div class="product-badge">New</div>
+          <div class="product-image-placeholder"></div>
+        </div>
+        <div class="product-info">
+          <h3>Forged Pro Series</h3>
+          <p class="product-description">18" Premium Alloy Wheel</p>
+          <div class="product-footer">
+            <span class="price">$899</span>
+            <button class="btn-add-cart">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-image">
+          <div class="product-badge">Popular</div>
+          <div class="product-image-placeholder"></div>
+        </div>
+        <div class="product-info">
+          <h3>Track Edition GT</h3>
+          <p class="product-description">19" Racing Wheel</p>
+          <div class="product-footer">
+            <span class="price">$1,299</span>
+            <button class="btn-add-cart">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-image">
+          <div class="product-image-placeholder"></div>
+        </div>
+        <div class="product-info">
+          <h3>Luxury Elite</h3>
+          <p class="product-description">20" Premium Design</p>
+          <div class="product-footer">
+            <span class="price">$1,599</span>
+            <button class="btn-add-cart">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-image">
+          <div class="product-image-placeholder"></div>
+        </div>
+        <div class="product-info">
+          <h3>Performance X</h3>
+          <p class="product-description">19" Sport Wheel</p>
+          <div class="product-footer">
+            <span class="price">$999</span>
+            <button class="btn-add-cart">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <div class="hero-buttons">
-    <a href="/login/" class="btn primary">Shop Wheels</a>
-    <a href="#" class="btn secondary">Explore Categories</a>
-  </div>
-</header>
+  <!-- Categories Section -->
+  <section class="section categories-section" id="categories">
+    <div class="section-header">
+      <h2>Our Categories</h2>
+      <p class="section-subtitle">Explore our curated collection of premium alloy wheels</p>
+    </div>
+    <div class="categories-grid">
+      <div class="category-card">
+        <div class="category-icon">
+          <div class="icon-placeholder"></div>
+        </div>
+        <h3>Forged Wheels</h3>
+        <p>Engineered for strength and lightweight performance</p>
+        <a href="#" class="category-link">Explore →</a>
+      </div>
+      <div class="category-card">
+        <div class="category-icon">
+          <div class="icon-placeholder"></div>
+        </div>
+        <h3>Performance Series</h3>
+        <p>Track-ready wheels for ultimate driving experience</p>
+        <a href="#" class="category-link">Explore →</a>
+      </div>
+      <div class="category-card">
+        <div class="category-icon">
+          <div class="icon-placeholder"></div>
+        </div>
+        <h3>Luxury Series</h3>
+        <p>Sophisticated designs for premium vehicles</p>
+        <a href="#" class="category-link">Explore →</a>
+      </div>
+      <div class="category-card">
+        <div class="category-icon">
+          <div class="icon-placeholder"></div>
+        </div>
+        <h3>Track Edition</h3>
+        <p>Race-inspired wheels for the enthusiast</p>
+        <a href="#" class="category-link">Explore →</a>
+      </div>
+    </div>
+  </section>
 
-<section class="section">
-  <h2>Featured Products</h2>
+  <!-- New Launches -->
+  <section class="section new-launches">
+    <div class="section-header">
+      <h2>New Launches</h2>
+      <a href="#" class="view-all">View All →</a>
+    </div>
+    <div class="launches-grid">
+      <div class="launch-card large">
+        <div class="launch-image">
+          <div class="launch-badge">Just Launched</div>
+          <div class="launch-image-placeholder"></div>
+        </div>
+        <div class="launch-content">
+          <h3>Aero Dynamic Series</h3>
+          <p>Revolutionary design meets cutting-edge technology</p>
+          <a href="#" class="btn primary">Learn More</a>
+        </div>
+      </div>
+      <div class="launch-card">
+        <div class="launch-image">
+          <div class="launch-image-placeholder"></div>
+        </div>
+        <div class="launch-content">
+          <h3>Carbon Fiber Edition</h3>
+          <p>Lightweight performance</p>
+          <a href="#" class="btn secondary">Discover</a>
+        </div>
+      </div>
+      <div class="launch-card">
+        <div class="launch-image">
+          <div class="launch-image-placeholder"></div>
+        </div>
+        <div class="launch-content">
+          <h3>Titanium Series</h3>
+          <p>Ultimate durability</p>
+          <a href="#" class="btn secondary">Discover</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <div class="grid">
-    <div class="card">Wheel Model A</div>
-    <div class="card">Wheel Model B</div>
-    <div class="card">Wheel Model C</div>
-    <div class="card">Wheel Model D</div>
-  </div>
-</section>
+  <!-- Why Choose Us -->
+  <section class="section why-choose">
+    <div class="section-header centered">
+      <h2>Why Choose WheelForge?</h2>
+      <p class="section-subtitle">Industry-leading quality and innovation</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 10V20L26 26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Premium Quality</h3>
+        <p>Each wheel is precision-engineered and rigorously tested for superior performance</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <path d="M20 5L25 15H35L27 22L30 32L20 26L10 32L13 22L5 15H15L20 5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Lifetime Warranty</h3>
+        <p>We stand behind our products with comprehensive warranty coverage</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <rect x="5" y="10" width="30" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M5 16H35" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </div>
+        <h3>Free Shipping</h3>
+        <p>Complimentary delivery on all orders across the country</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="16" r="6" stroke="currentColor" stroke-width="2"/>
+            <path d="M10 32C10 26 14 22 20 22C26 22 30 26 30 32" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Expert Support</h3>
+        <p>Dedicated team to help you find the perfect wheels for your vehicle</p>
+      </div>
+    </div>
+  </section>
 
-<section class="section dark">
-  <h2>Our Categories</h2>
-
-  <div class="grid">
-    <div class="card">Forged Wheels</div>
-    <div class="card">Performance Series</div>
-    <div class="card">Luxury Series</div>
-    <div class="card">Track Edition</div>
-  </div>
-</section>
-
-<section class="section">
-  <h2>New Launches</h2>
-
-  <div class="grid">
-    <div class="card">Launch A</div>
-    <div class="card">Launch B</div>
-    <div class="card">Launch C</div>
-  </div>
-</section>
-
-<footer class="footer">
-  <p>© WheelForge</p>
-</footer>
-
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>WheelForge</h3>
+        <p>Precision Forged. Performance Perfected.</p>
+        <div class="social-links">
+          <a href="#" class="social-link">FB</a>
+          <a href="#" class="social-link">IG</a>
+          <a href="#" class="social-link">TW</a>
+          <a href="#" class="social-link">LI</a>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="#">All Wheels</a></li>
+          <li><a href="#">Forged Wheels</a></li>
+          <li><a href="#">Performance</a></li>
+          <li><a href="#">Luxury</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Shipping Info</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">Warranty</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 WheelForge. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
-
 </html>

@@ -2,175 +2,301 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Profile</title>
-
-  <!-- Cropper.js CSS -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css"
-  />
-
-  <!-- Cropper.js JS -->
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js">
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - WheelForge</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
+    
+    <!-- Cropper.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    
+    <style>
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
 </head>
-
-<body>
-
-<h2>My Profile</h2>
-
-<!-- ================= PROFILE IMAGE DISPLAY ================= -->
-{% if user.profile_image %}
-  <img
-    src="{{ user.profile_image.url }}"
-    alt="Profile Image"
-    width="120"
-    height="120"
-    style="border-radius:50%; object-fit:cover;"
-  >
-{% else %}
-  <img
-    src="{% static 'images/default-avatar.png' %}"
-    alt="Default Avatar"
-    width="120"
-    height="120"
-    style="border-radius:50%; object-fit:cover;"
-  >
-{% endif %}
-
-<!-- ================= PROFILE IMAGE UPLOAD FORM ================= -->
-<form
-  method="post"
-  enctype="multipart/form-data"
-  action="{% url 'upload-profile-image' %}"
-  id="imageForm"
-  style="margin-top:10px;"
->
-  {% csrf_token %}
-
-  <input
-    type="file"
-    name="profile_image"
-    id="imageInput"
-    accept="image/*"
-    required
-  >
-
-  <button type="submit">Save Image</button>
-</form>
-
-<!-- ================= CROP PREVIEW CONTAINER ================= -->
-<div
-  id="cropContainer"
-  style="display:none; margin-top:15px; max-width:320px; border:1px solid #ccc; padding:10px;"
->
-  <img id="cropImage" style="max-width:100%;">
-</div>
-
-<hr>
-
-<p><strong>Email:</strong> {{ user.email }}</p>
-
-{% if user.auth_provider == "email" %}
-  <a href="{% url 'request-email-change' %}">Change Email</a>
-{% else %}
-  <p><em>Email is managed by {{ user.auth_provider|title }}.</em></p>
-{% endif %}
-
-<p><strong>Username:</strong> {{ user.username }}</p>
-<p><strong>Phone:</strong> {{ user.phone|default:"Not added" }}</p>
-<p><strong>Auth Provider:</strong> {{ user.auth_provider }}</p>
-
-<p><strong>Status:</strong>
-  {% if user.is_blocked %}
-    Blocked
-  {% else %}
-    Active
-  {% endif %}
-</p>
-
-<p><strong>Joined:</strong> {{ user.date_joined }}</p>
-
-<hr>
-
-<a href="{% url 'edit_profile' %}">Edit Profile</a>
-<hr>
-
-<a href="{% url 'logout' %}">Logout</a>
-
-<!-- ================= CROP SCRIPT (DOM-SAFE & GUARANTEED) ================= -->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-  let cropper = null;
-
-  const input = document.getElementById("imageInput");
-  const cropContainer = document.getElementById("cropContainer");
-  const cropImage = document.getElementById("cropImage");
-  const form = document.getElementById("imageForm");
-
-  // Safety checks
-  if (!input || !cropImage || !form) {
-    console.error("Cropper elements missing");
-    return;
-  }
-
-  // When user selects image
-  input.addEventListener("change", function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function () {
-      cropImage.src = reader.result;
-      cropContainer.style.display = "block";
-
-      // Destroy old cropper if exists
-      if (cropper) {
-        cropper.destroy();
-      }
-
-      cropper = new Cropper(cropImage, {
-        aspectRatio: 1,
-        viewMode: 1,
-        autoCropArea: 1,
-      });
-    };
-
-    reader.readAsDataURL(file);
-  });
-
-  // On submit → replace file with cropped version
-  form.addEventListener("submit", function (e) {
-
-    // If cropper not initialized, allow normal upload
-    if (!cropper) return;
-
-    e.preventDefault();
-
-    cropper.getCroppedCanvas({
-      width: 300,
-      height: 300,
-    }).toBlob(function (blob) {
-
-      const file = new File([blob], "profile.png", {
-        type: "image/png",
-      });
-
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-
-      input.files = dataTransfer.files;
-
-      form.submit();
-    });
-  });
-
-});
-</script>
-
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen py-8 px-4">
+    
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <h1 class="text-4xl font-bold text-slate-800 mb-2">My Profile</h1>
+            <p class="text-slate-600">Manage your WheelForge account</p>
+        </div>
+        
+        <!-- Main Profile Card -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden fade-in">
+            
+            <!-- Profile Header Section -->
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-8 py-12">
+                <div class="flex flex-col items-center">
+                    
+                    <!-- Profile Image Display -->
+                    <div class="relative group mb-6">
+                        {% if user.profile_image %}
+                        <img
+                            src="{{ user.profile_image.url }}"
+                            alt="Profile Image"
+                            class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg transition-transform group-hover:scale-105"
+                        >
+                        {% else %}
+                        <img
+                            src="{% static 'images/default-avatar.png' %}"
+                            alt="Default Avatar"
+                            class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg transition-transform group-hover:scale-105"
+                        >
+                        {% endif %}
+                        
+                        <!-- Camera Icon Overlay -->
+                        <div class="absolute bottom-0 right-0 bg-blue-600 rounded-full p-2 shadow-lg">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Upload Form -->
+                    <form
+                        method="post"
+                        enctype="multipart/form-data"
+                        action="{% url 'upload-profile-image' %}"
+                        id="imageForm"
+                        class="w-full max-w-md"
+                    >
+                        {% csrf_token %}
+                        
+                        <div class="flex gap-3">
+                            <label class="flex-1 cursor-pointer">
+                                <input
+                                    type="file"
+                                    name="profile_image"
+                                    id="imageInput"
+                                    accept="image/*"
+                                    required
+                                    class="hidden"
+                                >
+                                <div class="bg-white text-slate-800 px-4 py-2 rounded-lg font-medium text-center hover:bg-slate-100 transition-colors">
+                                    Choose Photo
+                                </div>
+                            </label>
+                            
+                            <button 
+                                type="submit"
+                                class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-md"
+                            >
+                                Save Image
+                            </button>
+                        </div>
+                        
+                        <p class="text-slate-300 text-sm mt-3 text-center">
+                            JPG, PNG or GIF (max. 5MB)
+                        </p>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Crop Preview Container -->
+            <div
+                id="cropContainer"
+                class="hidden mx-8 my-6 border-2 border-dashed border-slate-300 rounded-lg p-4 bg-slate-50"
+            >
+                <p class="text-slate-700 font-medium mb-3">Adjust your photo:</p>
+                <img id="cropImage" class="max-w-full rounded-lg">
+            </div>
+            
+            <!-- Profile Information Section -->
+            <div class="px-8 py-8">
+                
+                <!-- Account Status Badge -->
+                <div class="mb-6">
+                    {% if user.is_blocked %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                        <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                        </svg>
+                        Account Blocked
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        Active Account
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <!-- Information Grid -->
+                <div class="space-y-5">
+                    
+                    <!-- Email -->
+                    <div class="flex items-start justify-between border-b border-slate-200 pb-4">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-slate-500 mb-1">Email Address</p>
+                            <p class="text-slate-800 font-medium">{{ user.email }}</p>
+                            {% if user.auth_provider != "email" %}
+                            <p class="text-sm text-slate-500 italic mt-1">Managed by {{ user.auth_provider|title }}</p>
+                            {% endif %}
+                        </div>
+                        {% if user.auth_provider == "email" %}
+                        <a 
+                            href="{% url 'request-email-change' %}"
+                            class="text-blue-600 hover:text-blue-700 text-sm font-medium ml-4 whitespace-nowrap"
+                        >
+                            Change Email
+                        </a>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Username -->
+                    <div class="flex items-start border-b border-slate-200 pb-4">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-slate-500 mb-1">Username</p>
+                            <p class="text-slate-800 font-medium">{{ user.username }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone -->
+                    <div class="flex items-start border-b border-slate-200 pb-4">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-slate-500 mb-1">Phone Number</p>
+                            <p class="text-slate-800 font-medium">
+                                {% if user.phone %}
+                                {{ user.phone }}
+                                {% else %}
+                                <span class="text-slate-400">Not added</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Auth Provider -->
+                    <div class="flex items-start border-b border-slate-200 pb-4">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-slate-500 mb-1">Authentication Method</p>
+                            <p class="text-slate-800 font-medium capitalize">{{ user.auth_provider }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Member Since -->
+                    <div class="flex items-start">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-slate-500 mb-1">Member Since</p>
+                            <p class="text-slate-800 font-medium">{{ user.date_joined|date:"F j, Y" }}</p>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="mt-8 pt-6 border-t border-slate-200 flex gap-3">
+                    <a 
+                        href="{% url 'edit_profile' %}"
+                        class="flex-1 bg-slate-800 text-white px-6 py-3 rounded-lg font-medium text-center hover:bg-slate-900 transition-colors shadow-md"
+                    >
+                        Edit Profile
+                    </a>
+                    
+                    <a 
+                        href="{% url 'logout' %}"
+                        class="flex-1 bg-white border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-medium text-center hover:bg-slate-50 transition-colors"
+                    >
+                        Logout
+                    </a>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <!-- Back to Home Link -->
+        <div class="text-center mt-6">
+            <a href="/" class="text-slate-600 hover:text-slate-800 font-medium inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Home
+            </a>
+        </div>
+        
+    </div>
+    
+    <!-- Cropper Script (DOM-SAFE & GUARANTEED) -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let cropper = null;
+            const input = document.getElementById("imageInput");
+            const cropContainer = document.getElementById("cropContainer");
+            const cropImage = document.getElementById("cropImage");
+            const form = document.getElementById("imageForm");
+            
+            // Safety checks
+            if (!input || !cropImage || !form) {
+                console.error("Cropper elements missing");
+                return;
+            }
+            
+            // When user selects image
+            input.addEventListener("change", function (e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function () {
+                    cropImage.src = reader.result;
+                    cropContainer.classList.remove("hidden");
+                    
+                    // Destroy old cropper if exists
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    
+                    cropper = new Cropper(cropImage, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        autoCropArea: 1,
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            // On submit → replace file with cropped version
+            form.addEventListener("submit", function (e) {
+                // If cropper not initialized, allow normal upload
+                if (!cropper) return;
+                
+                e.preventDefault();
+                
+                cropper.getCroppedCanvas({
+                    width: 300,
+                    height: 300,
+                }).toBlob(function (blob) {
+                    const file = new File([blob], "profile.png", {
+                        type: "image/png",
+                    });
+                    
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    input.files = dataTransfer.files;
+                    
+                    form.submit();
+                });
+            });
+        });
+    </script>
+    
 </body>
 </html>
-
