@@ -1,4 +1,12 @@
 from django.urls import path
+from accounts.views import (
+    request_email_change_view,
+    verify_email_change_otp_view,
+    address_list_view,
+    add_address_view,
+    edit_address_view,
+    delete_address_view,
+)
 from . import views
 
 urlpatterns=[

@@ -1,4 +1,20 @@
 from django.urls import path
+
+from core.views import (
+    home_view,
+    signup_view,
+    login_view,
+    logout_view,
+    verify_otp_view,
+    resend_otp_view,
+    profile_view,
+    upload_profile_image_view,
+    edit_profile_view,
+    forgot_password_view,
+    verify_forgot_otp_view,
+    reset_password_view,
+)
+
 from . import views
 
 urlpatterns = [

@@ -1,4 +1,15 @@
 from django.urls import path
+
+from adminpanel.views import (
+    admin_login_view,
+    admin_logout_view,
+    admin_dashboard_view,
+    admin_user_list_view,
+    admin_block_user_view,
+    admin_unblock_user_view,
+    admin_confirm_block_user_view,
+    admin_confirm_unblock_user_view,
+)
 from . import views
 
 urlpatterns = [
