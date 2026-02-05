@@ -14,8 +14,8 @@
       <strong>Default</strong>
     {% endif %}
 
-    <a href="{% url 'edit-address' address.id %}">Edit</a>
-    <a href="{% url 'delete-address' address.id %}">Delete</a>
+    <a href="{% url 'edit-address' address.uuid %}">Edit</a>
+    <a href="{% url 'delete-address' address.uuid %}">Delete</a>
   </div>
 {% empty %}
   <p>No addresses added yet.</p>

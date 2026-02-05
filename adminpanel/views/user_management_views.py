@@ -35,10 +35,10 @@ def admin_user_list_view(request):
 
 @admin_required
 @require_POST
-def admin_block_user_view(request, user_id):
+def admin_block_user_view(request, uuid):
     user = get_object_or_404(
         User,
-        id=user_id
+        uuid=uuid
     )
 
     if user == request.user:
@@ -59,10 +59,10 @@ def admin_block_user_view(request, user_id):
 
 @admin_required
 @require_POST
-def admin_unblock_user_view(request, user_id):
+def admin_unblock_user_view(request, uuid):
     user = get_object_or_404(
         User,
-        id=user_id
+        uuid=uuid
     )
 
     user.is_blocked = False
@@ -70,16 +70,16 @@ def admin_unblock_user_view(request, user_id):
 
     messages.success(
         request,
-        f'{user.email} has been blocked.'
+        f'{user.email} has been unblocked.'
     )
     return redirect('admin-user-list')
 
 
 @admin_required
-def admin_confirm_block_user_view(request, user_id):
+def admin_confirm_block_user_view(request, uuid):
     user = get_object_or_404(
         User,
-        id=user_id
+        uuid=uuid
     )
 
     if user == request.user:
@@ -102,15 +102,15 @@ def admin_confirm_block_user_view(request, user_id):
     )
 
 @admin_required
-def admin_confirm_unblock_user_view(request, user_id):
+def admin_confirm_unblock_user_view(request, uuid):
     user = get_object_or_404(
         User,
-        id=user_id
+        uuid=uuid
     )
 
     return render(
         request,
-        'adminpanel/cofirm_unblock.html',
+        'adminpanel/confirm_unblock.html',
         {
             'target_user': user
         },

@@ -3,7 +3,7 @@
   Are you sure you want to block <strong>{{ target_user.email }}</strong>?
 </p>
 
-<form method="post" action="{% url 'admin-block-user' target_user.id %}">
+<form method="post" action="{% url 'admin-block-user' target_user.uuid %}">
   {% csrf_token %}
   <button type="submit">Yes, Block</button>
   <a href="{% url 'admin-user-list' %}">Cancel</a>

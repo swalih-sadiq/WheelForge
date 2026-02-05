@@ -1,3 +1,5 @@
+import uuid 
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
@@ -8,6 +10,13 @@ from datetime import timedelta
 # Create your models here.
 
 class User(AbstractUser):
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        db_index=True
+    )
+
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=10, blank=True, null=True)
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
@@ -23,6 +32,13 @@ class User(AbstractUser):
         return self.email
     
 class OTPVerification(models.Model):
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        db_index=True
+    )
+
     PURPOSE_CHOICES = (
         ('signup', 'Signup'),
         ('forgot_password', 'Forgot Password'),
@@ -48,6 +64,13 @@ class OTPVerification(models.Model):
     
 
 class Address(models.Model):
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        db_index=True 
+    )
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='addresses')
     full_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=10)

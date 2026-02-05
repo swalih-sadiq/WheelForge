@@ -48,10 +48,10 @@ def add_address_view(request):
 
 
 @login_required
-def edit_address_view(request, address_id):
+def edit_address_view(request, uuid):
     address = get_object_or_404(
         Address,
-        id=address_id,
+        uuid=uuid,
         user=request.user
     )
 
@@ -88,10 +88,10 @@ def edit_address_view(request, address_id):
 
 
 @login_required
-def delete_address_view(request, address_id):
+def delete_address_view(request, uuid):
     address = get_object_or_404(
         Address,
-        id=address_id,
+        uuid=uuid,
         user=request.user
     )
 
