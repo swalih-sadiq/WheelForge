@@ -2,13 +2,18 @@ import time
 
 from django.shortcuts import render, redirect 
 from django.contrib import messages 
-from django.contrib.auth.decorators import login_required 
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 from django.core.mail import send_mail
-from django.conf import settings 
+from django.conf import settings
+
+from django.contrib.auth import get_user_model
 
 from .utils import generate_otp, clear_email_change_session 
 
+User = get_user_model()
 
+@never_cache
 @login_required
 def request_email_change_view(request):
     if request.user.auth_provider != 'email':
@@ -19,7 +24,7 @@ def request_email_change_view(request):
         return redirect('profile')
 
     if request.method == "POST":
-        new_email = request.POST.get("email")
+        new_email = request.POST.get("email").strip().lower()
 
         if not new_email:
             messages.error(request, "Email is required.")
@@ -27,6 +32,13 @@ def request_email_change_view(request):
 
         if new_email == request.user.email:
             messages.error(request, "New email must be different.")
+            return redirect("request-email-change")
+        
+        if User.objects.filter(email=new_email).exists():
+            messages.error(
+                request,
+                "This email is already in use."
+            )
             return redirect("request-email-change")
 
         # ---------- RATE LIMIT (max 3) ----------
@@ -64,7 +76,7 @@ def request_email_change_view(request):
     return render(request, "accounts/request_email_change.html")
 
 
-
+@never_cache
 @login_required
 def verify_email_change_otp_view(request):
     if request.method == "POST":
@@ -87,6 +99,14 @@ def verify_email_change_otp_view(request):
         if entered_otp != session_otp:
             messages.error(request, "Invalid OTP.")
             return redirect("verify-email-change-otp")
+        
+        if User.objects.filter(email=new_email).exclude(id=request.user.id).exists():
+            messages.error(
+                request,
+                "This email is already in use."
+            )
+            clear_email_change_session(request)
+            return redirect("request-email-change")
 
         # ---------- UPDATE EMAIL ----------
         old_email = request.user.email

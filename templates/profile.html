@@ -619,9 +619,20 @@
         });
     });
 
-    document.addEventListener("DOMContentLoaded", () => {
-    showSection("personal-info");
+document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const section = params.get("section") || "personal-info";
+    showSection(section);
+
+    // Auto-open add address form if section is addresses AND there are messages
+    if (section === "addresses") {
+        const hasMessages = document.querySelector('.messages');
+        if (hasMessages) {
+            showAddAddressForm();
+        }
+    }
 });
+
 
 </script>
 {% endblock %}

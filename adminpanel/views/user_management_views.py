@@ -6,7 +6,6 @@ from django.views.decorators.http import require_POST
 from accounts.models import User
 from adminpanel.decorators import admin_required
 
-
 @admin_required
 def admin_user_list_view(request):
     query = request.GET.get('q', '').strip()
@@ -19,7 +18,7 @@ def admin_user_list_view(request):
         )
 
 
-    paginator = Paginator(users, 20)
+    paginator = Paginator(users, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 

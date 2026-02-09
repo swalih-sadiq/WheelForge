@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash 
 from django.shortcuts import render, redirect , get_object_or_404
@@ -13,11 +14,12 @@ from .utils import generate_otp
 
 User = get_user_model()
 
-@login_required(login_url='login')
+@never_cache
 def forgot_password_view(request):
     if request.method == "POST":
         user = request.user
-        email = user.email
+        email = request.POST.get("email", "").strip().lower()
+
 
         if not email:
             messages.error(request, "Email is required.")
@@ -79,7 +81,7 @@ def forgot_password_view(request):
 
     return render(request, "forgot_password.html")
 
-@login_required(login_url='login')
+@never_cache
 def verify_forgot_otp_view(request):
 
     if request.session.get("otp_purpose") != "forgot_password":
@@ -133,6 +135,8 @@ def verify_forgot_otp_view(request):
 
     return render(request, "verify_forgot_otp.html")
 
+
+@login_required(login_url='login')
 def reset_password_view(request):
     user_id = request.session.get("otp_user_id")
     purpose = request.session.get("otp_purpose")
@@ -183,7 +187,7 @@ def reset_password_view(request):
 
     return render(request, "reset_password.html")
 
-
+@never_cache
 @login_required
 def change_password_view(request, uuid):
     print("METHOD:", request.method)

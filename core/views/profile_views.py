@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 from accounts.models import Address 
 
 
@@ -15,6 +16,7 @@ from accounts.models import Address
 #         "profile.html",
 #         {"user": request.user}
 #     )
+@never_cache
 @login_required
 def profile_view(request, uuid):
     if request.user.uuid != uuid:
@@ -25,10 +27,9 @@ def profile_view(request, uuid):
     return render(
         request,
         "profile.html",   
-        {
-            "addresses": addresses,
-        }
-    )
+        {"addresses": addresses}
+        )
+
 @login_required
 def upload_profile_image_view(request, uuid):
     if request.user.uuid != uuid:
@@ -78,12 +79,27 @@ def edit_profile_view(request, uuid):
             "phone", ""
         ).strip()
 
-        if phone and len(phone) < 10:
+        if first_name and not first_name.isalpha():
             messages.error(
                 request,
-                "Phone number must be at least 10 digits."
+                "First name must contain only alphabets."
             )
             return redirect("edit_profile", uuid=request.user.uuid)
+        
+        if last_name and not last_name.isalpha():
+            messages.error(
+                request,
+                "Last name must contain only alphabets."
+            )
+            return redirect("edit_profile", uuid=request.user.uuid)
+
+        if phone:
+            if not phone.isdigit() or len(phone) != 10:
+                messages.error(
+                    request,
+                    "Phone number must contain exactly 10 digits."
+                )
+                return redirect("edit_profile", uuid=request.user.uuid)
 
         user.first_name = first_name
         user.last_name = last_name

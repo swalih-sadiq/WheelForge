@@ -117,7 +117,7 @@ AUTHENTICATION_BACKENDS =(
 
 # Login redirect for @login_required
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/profile/'
+LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 ACCOUNT_LOGIN_METHODS = {'email'}
