@@ -1,22 +1,14 @@
-<h2>My Addresses</h2>
+{% extends "profile.html" %}
+{% load static %}
 
-<a href="{% url 'add-address' %}">Add Address</a>
+{% block title %}My Addresses - WheelForge{% endblock %}
 
-{% for address in addresses %}
-  <div>
-    <p>
-      {{ address.full_name }},
-      {{ address.address_line_1 }},
-      {{ address.city }}
-    </p>
-
-    {% if address.is_default %}
-      <strong>Default</strong>
-    {% endif %}
-
-    <a href="{% url 'edit-address' address.uuid %}">Edit</a>
-    <a href="{% url 'delete-address' address.uuid %}">Delete</a>
-  </div>
-{% empty %}
-  <p>No addresses added yet.</p>
-{% endfor %}
+{% block extra_js %}
+{{ block.super }}
+<script>
+// Auto-show addresses section on page load
+document.addEventListener("DOMContentLoaded", function() {
+    showSection('addresses');
+});
+</script>
+{% endblock %}

@@ -1,20 +1,34 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from accounts.models import Address 
 
 
+# @login_required
+# def profile_view(request, uuid):
+#     if request.user.uuid != uuid:
+#         messages.error(request, 'Unauthorized access.')
+#         return redirect('profile', uuid=request.user.uuid)
+    
+#     return render(
+#         request,
+#         "profile.html",
+#         {"user": request.user}
+#     )
 @login_required
 def profile_view(request, uuid):
     if request.user.uuid != uuid:
-        messages.error(request, 'Unauthorized access.')
-        return redirect('profile', uuid=request.user.uuid)
-    
+        return redirect("home")
+
+    addresses = Address.objects.filter(user=request.user)
+
     return render(
         request,
-        "profile.html",
-        {"user": request.user}
+        "profile.html",   
+        {
+            "addresses": addresses,
+        }
     )
-
 @login_required
 def upload_profile_image_view(request, uuid):
     if request.user.uuid != uuid:

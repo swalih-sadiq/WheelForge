@@ -13,8 +13,8 @@
         .float-animation {
             animation: float 6s ease-in-out infinite;
         }
-        {% block extra_css %}{% endblock %}
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-white min-h-screen flex flex-col">
     
@@ -38,12 +38,30 @@
                 
                 <!-- Actions -->
                 <div class="flex items-center space-x-4">
-                    <!-- Search Button -->
-                    <button class="p-2 hover:bg-gray-100 rounded-lg transition">
+                   <!-- Wishlist Button -->
+                    <a 
+                        href="#"
+                        class="p-2 hover:bg-gray-100 rounded-lg transition relative group"
+                        title="Wishlist"
+                    >
                         <svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
-                    </button>
+
+                        <!-- Empty indicator -->
+                        <span class="absolute -top-1 -right-1 bg-slate-400 text-white text-[10px] rounded-full px-1.5 py-0.5">
+                            0
+                        </span>
+
+                        <!-- Tooltip -->
+                        <span class="absolute top-full mt-2 left-1/2 -translate-x-1/2 whitespace-nowrap
+                                    bg-gray-900 text-white text-xs rounded px-2 py-1
+                                    opacity-0 group-hover:opacity-100 transition">
+                            Wishlist (Empty)
+                        </span>
+                    </a>
+
                     
                     <!-- Cart Button -->
                     <button class="p-2 hover:bg-gray-100 rounded-lg transition relative">
@@ -103,6 +121,48 @@
 
     <!-- Main Content -->
     <main class="flex-grow pt-16">
+        {% if messages %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 space-y-3">
+    {% for message in messages %}
+        <div
+            class="
+                px-4 py-3 rounded-lg border flex items-start gap-3
+                {% if message.tags == 'success' %}
+                    bg-green-50 border-green-400 text-green-800
+                {% elif message.tags == 'error' %}
+                    bg-red-50 border-red-400 text-red-800
+                {% elif message.tags == 'warning' %}
+                    bg-yellow-50 border-yellow-400 text-yellow-800
+                {% else %}
+                    bg-blue-50 border-blue-400 text-blue-800
+                {% endif %}
+            "
+        >
+            <!-- Icon -->
+            <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                {% if message.tags == 'success' %}
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                {% elif message.tags == 'error' %}
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                {% else %}
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-1 3a1 1 0 00-1 1v3a1 1 0 002 0v-3a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                {% endif %}
+            </svg>
+
+            <!-- Message -->
+            <p class="flex-1 font-medium">
+                {{ message }}
+            </p>
+
+            <!-- Close button -->
+            <button onclick="this.parentElement.remove()" class="text-lg font-bold leading-none">
+                &times;
+            </button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
         {% block content %}
         <!-- Page content goes here -->
         {% endblock %}

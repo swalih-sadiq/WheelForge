@@ -1,4 +1,5 @@
 from django.urls import path
+from core.views.password_views import change_password_view 
 
 from core.views import (
     home_view,
@@ -30,4 +31,5 @@ urlpatterns = [
     path('profile/<uuid:uuid>/', profile_view, name='profile'),
     path('profile/<uuid:uuid>/image/', upload_profile_image_view, name='upload-profile-image'),
     path('profile/<uuid:uuid>/edit/', edit_profile_view, name='edit_profile'),
+    path('change-password/<uuid:uuid>/', change_password_view, name='change-password'),
 ]

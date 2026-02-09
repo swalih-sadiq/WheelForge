@@ -1,6 +1,9 @@
 from datetime import timedelta
 
-from django.shortcuts import render, redirect 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash 
+from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -10,10 +13,11 @@ from .utils import generate_otp
 
 User = get_user_model()
 
-
+@login_required(login_url='login')
 def forgot_password_view(request):
     if request.method == "POST":
-        email = request.POST.get("email")
+        user = request.user
+        email = user.email
 
         if not email:
             messages.error(request, "Email is required.")
@@ -63,7 +67,6 @@ def forgot_password_view(request):
             expires_at=OTPVerification.get_expiry_time()
         )
 
-        print(f"FORGOT PASSWORD OTP for {user.email}: {otp}")
 
         request.session["otp_user_id"] = user.id
         request.session["otp_purpose"] = "forgot_password"
@@ -76,8 +79,17 @@ def forgot_password_view(request):
 
     return render(request, "forgot_password.html")
 
-
+@login_required(login_url='login')
 def verify_forgot_otp_view(request):
+
+    if request.session.get("otp_purpose") != "forgot_password":
+        messages.error(request, "Invalid OTP session.")
+        return redirect("forgot_password")
+
+    if request.session.get("otp_user_id") != request.user.id:
+        messages.error(request, "Unauthorized OTP access.")
+        return redirect("forgot_password")
+        
     user_id = request.session.get("otp_user_id")
 
     if not user_id:
@@ -87,7 +99,7 @@ def verify_forgot_otp_view(request):
         )
         return redirect("forgot_password")
 
-    user = User.objects.get(id=user_id)
+    user = get_object_or_404(User, id=user_id)
 
     if request.method == "POST":
         otp_input = request.POST.get("otp")
@@ -170,3 +182,40 @@ def reset_password_view(request):
         return redirect("login")
 
     return render(request, "reset_password.html")
+
+
+@login_required
+def change_password_view(request, uuid):
+    print("METHOD:", request.method)
+    print("POST DATA:", request.POST)
+    user = get_object_or_404(User, uuid=uuid)
+
+    # users can change ONLY their own password
+    if request.user != user:
+        messages.error(request, "Unauthorized action.")
+        return redirect("profile", request.user.uuid)
+
+    if request.method == "POST":
+        form = PasswordChangeForm(user=user, data=request.POST)
+
+        if form.is_valid():
+            updated_user = form.save()
+
+            # KEEP SESSION ALIVE (CRITICAL)
+            update_session_auth_hash(request, updated_user)
+
+            messages.success(request, "Password changed successfully.")
+            return redirect("profile", user.uuid)
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = PasswordChangeForm(user=user)
+
+    return render(
+        request,
+        "change_password.html",
+        {
+            "form": form,
+            "user_obj": user
+        }
+    )

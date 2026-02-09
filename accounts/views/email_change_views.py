@@ -107,6 +107,6 @@ def verify_email_change_otp_view(request):
             request,
             "Email updated successfully."
         )
-        return redirect("profile")
+        return redirect("profile", uuid=request.user.uuid)
 
     return render(request, "accounts/verify_email_change_otp.html")

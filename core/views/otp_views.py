@@ -4,7 +4,10 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from .utils import generate_otp
+from django.core.mail import send_mail
+from django.conf import settings
+from core.utils.otp import generate_otp
+from core.utils.email import send_otp_email
 
 from accounts.models import OTPVerification
 
@@ -98,7 +101,8 @@ def resend_otp_view(request):
         expires_at=OTPVerification.get_expiry_time()
     )
 
-    print(f"RESEND OTP for {user.email}: {otp.otp}")
+    send_otp_email(user.email, otp.otp, 'signup')
+    # print(f"RESEND OTP for {user.email}: {otp.otp}")
     messages.success(
         request,
         "OTP resent successfully."

@@ -6,14 +6,16 @@ from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.utils import timezone
 
 from accounts.models import OTPVerification
-from .utils import generate_otp
+from core.utils.otp import generate_otp
+from core.utils.email import send_otp_email
+
 
 User = get_user_model()
 
 
 def signup_view(request):
     if request.method == "POST":
-        email = request.POST.get("email")
+        email = request.POST.get("email", "").strip().lower()
         password = request.POST.get("password")
 
         if not email or not password:
@@ -40,7 +42,8 @@ def signup_view(request):
             expires_at=OTPVerification.get_expiry_time()
         )
 
-        print(f"SIGNUP OTP for {email}: {otp}")
+        send_otp_email(email, otp, 'signup')
+        
 
         request.session["otp_user_id"] = user.id
         messages.success(request, "OTP sent to your email.")
@@ -51,11 +54,21 @@ def signup_view(request):
 
 def login_view(request):
     if request.method == "POST":
-        email = request.POST.get("email")
-        password = request.POST.get("password")
+        email = request.POST.get("email", "").strip().lower()
+        password = request.POST.get("password", "")
 
         if not email or not password:
             messages.error(request, "All fields are required.")
+            return redirect("login")
+        
+        if '@' not in email or '.' not in email:
+            messages.error(request, "Enter a valid email address.")
+            return redirect('login')
+        
+        try:
+            existing_user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, "Invalid email or password.")
             return redirect("login")
 
         user = authenticate(request, username=email, password=password)
@@ -97,7 +110,7 @@ def login_view(request):
                 expires_at=OTPVerification.get_expiry_time()
             )
 
-            print(f"LOGIN OTP RESENT for {user.email}: {otp}")
+            send_otp_email(user.email, otp, 'signup')
             request.session["otp_user_id"] = user.id
             messages.warning(
                 request,
@@ -112,6 +125,7 @@ def login_view(request):
     return render(request, "login.html")
 
 def logout_view(request):
-    logout(request)
-    messages.success(request, "Logged out successfully.")
+    if request.method == 'POST':
+        logout(request)
+        messages.success(request, "Logged out successfully.")
     return redirect("login")

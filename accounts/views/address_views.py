@@ -80,6 +80,7 @@ def edit_address_view(request, uuid):
         )
         return redirect("address-list")
 
+
     return render(
         request,
         "accounts/edit_address.html",
