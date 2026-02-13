@@ -9,6 +9,8 @@ from django.views.decorators.cache import never_cache
 from accounts.models import OTPVerification
 from core.utils.otp import generate_otp
 from core.utils.email import send_otp_email
+from core.utils.validators import validate_signup_data
+from core.utils.validators import validate_login_data
 
 
 User = get_user_model()
@@ -17,69 +19,38 @@ User = get_user_model()
 def signup_view(request):
     if request.method == "POST":
 
-        request.session.pop("otp_user_id", None)
-        request.session.pop("otp_purpose", None)
-        request.session.pop("otp_created_at", None)
+        for key in list(request.session.keys()):
+            if key.startswith('signup_'):
+                request.session.pop(key, None)
         
-        email = request.POST.get("email", "").strip().lower()
-        password = request.POST.get("password").strip()
-        confirm_password = request.POST.get("confirm_password", "").strip()
-
-        if not email or not password or not confirm_password:
-            messages.error(request, "All fields are required.")
-            return redirect("signup")
+        errors = validate_signup_data(request.POST)
+        if errors:
+            for error in errors.values():
+                messages.error(request, error)
+            return redirect('signup')
         
-        if "@" not in email or "." not in email:
-            messages.error(request, "Enter a valid email address.")
-            return redirect("signup")
-        
-        if len(password) < 8:
-            messages.error(
-                request,
-                "Password must be at least 8 characters long."
-            )
-            return redirect("signup")
-        
-        if password.isdigit():
-            messages.error(
-                request,
-                "Password cannot be entirely numeric."
-            )
-            return redirect("signup")
-        
-        if password != confirm_password:  # 🔹 ADDED
-            messages.error(
-                request,
-                "Password and Confirm Password do not match."
-            )
-            return redirect("signup")
+        email = request.POST.get('email', '').strip().lower()
+        password = request.POST.get('password')
 
         if User.objects.filter(email=email).exists():
             messages.error(request, "Email already registered.")
             return redirect("signup")
 
-        user = User.objects.create_user(
-            username=email,
-            email=email,
-            password=password,
-            is_active=False
-        )
-
         otp = generate_otp()
+        request.session['signup_email'] = email
+        request.session['signup_password'] = password
+        request.session['signup_otp'] = otp
+        request.session['signup_otp_created_at'] = timezone.now().isoformat()
 
-        OTPVerification.objects.create(
-            user=user,
-            otp=otp,
-            purpose="signup",
-            expires_at=OTPVerification.get_expiry_time()
-        )
+        # otp via session handling
+        # OTPVerification.objects.create(
+        #     user=None,
+        #     otp=otp,
+        #     purpose='signup',
+        #     expires_at=OTPVerification.get_expiry_time()
+        # )
 
         send_otp_email(email, otp, 'signup')
-        
-
-        request.session["otp_user_id"] = user.id
-        request.session['otp_purpose'] = 'signup'
-        request.session['otp_created_at'] = timezone.now().isoformat()
         messages.success(request, "OTP sent to your email.")
         return redirect("verify_otp")
 
@@ -88,25 +59,19 @@ def signup_view(request):
 @never_cache
 def login_view(request):
     if request.method == "POST":
-
+        
         request.session.pop("otp_user_id", None)
         request.session.pop("otp_purpose", None)
         request.session.pop("otp_created_at", None)
 
-        email = request.POST.get("email", "").strip().lower()
-        password = request.POST.get("password", "").strip()
-
-        if not email or not password:
-            messages.error(request, "All fields are required.")
-            return redirect("login")
-        
-        if len(email) > 60:
-            messages.error(request, "Enter a valid email address.")
-            return redirect("login")
-        
-        if '@' not in email or '.' not in email:
-            messages.error(request, "Enter a valid email address.")
+        errors = validate_login_data(request.POST)
+        if errors:
+            for error in errors.values():
+                messages.error(request, error)
             return redirect('login')
+    
+        email = request.POST.get('email', '').strip().lower()
+        password = request.POST.get('password')
         
         try:
             existing_user = User.objects.get(email=email)
@@ -125,10 +90,7 @@ def login_view(request):
             return redirect("login")
 
         if not user.is_active:
-            messages.error(
-                request,
-                "Your account is not verified. Please verify your email first."
-            )
+            messages.error(request,"Your account is not verified. Please verify your email first.")
             return redirect("login")
 
         request.session.flush()

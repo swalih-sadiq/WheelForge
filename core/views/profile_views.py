@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from accounts.models import Address 
 
+from core.decorators import user_required
+
 
 # @login_required
 # def profile_view(request, uuid):
@@ -18,6 +20,7 @@ from accounts.models import Address
 #     )
 @never_cache
 @login_required
+@user_required
 def profile_view(request, uuid):
     if request.user.uuid != uuid:
         return redirect("home")
@@ -31,6 +34,7 @@ def profile_view(request, uuid):
         )
 
 @login_required
+@user_required
 def upload_profile_image_view(request, uuid):
     if request.user.uuid != uuid:
         messages.error(request, 'Unauthorized access')
@@ -61,6 +65,7 @@ def upload_profile_image_view(request, uuid):
 
 
 @login_required
+@user_required
 def edit_profile_view(request, uuid):
     if request.user.uuid != uuid:
         messages.error(request, 'Unauthorized access')

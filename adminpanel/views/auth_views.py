@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 
 
-from adminpanel.decorators import admin_required
+from core.decorators import admin_required
 
 
 def admin_login_view(request):
@@ -21,10 +21,15 @@ def admin_login_view(request):
         )
 
         if user is None or not user.is_superuser:
-            messages.error(
-                request,
-                'Invalid admin credentials,'
-            )
+            messages.error(request,'Invalid admin credentials,')
+            return redirect('admin-login')
+        
+        if getattr(user, 'is_blocked', False):
+            messages.error(request, 'Your account has been blocked.')
+            return redirect('admin-login')
+        
+        if not user.is_active:
+            messages.error(request, 'Your account is inactive')
             return redirect('admin-login')
 
         login(request, user)

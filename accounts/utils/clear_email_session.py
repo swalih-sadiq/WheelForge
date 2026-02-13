@@ -1,10 +1,3 @@
-import time
-import random
-
-def generate_otp():
-    return str(random.randint(100000, 999999))
-
-
 def clear_email_change_session(request):
     keys = [
         'email_change_otp',

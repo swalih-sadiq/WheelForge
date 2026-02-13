@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 
 from accounts.models import User
-from adminpanel.decorators import admin_required
+from core.decorators import admin_required
 
 @admin_required
 def admin_user_list_view(request):

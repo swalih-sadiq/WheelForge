@@ -3,16 +3,17 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
-from accounts.models import Address 
+from accounts.models import Address
+from core.decorators import user_required
 
 
-@login_required
+@user_required
 def address_list_view(request):
     addresses = Address.objects.filter(user=request.user)
     return render(request, 'accounts/address_list.html', {'addresses': addresses})
 
 
-@login_required
+@user_required
 def add_address_view(request):
     if request.method == "POST":
         has_addresses = Address.objects.filter(
@@ -94,7 +95,7 @@ def add_address_view(request):
     return render(request, "accounts/add_address.html")
 
 
-@login_required
+@user_required
 def edit_address_view(request, uuid):
     address = get_object_or_404(
         Address,
@@ -171,7 +172,7 @@ def edit_address_view(request, uuid):
     )
 
 
-@login_required
+@user_required
 def delete_address_view(request, uuid):
     address = get_object_or_404(
         Address,
