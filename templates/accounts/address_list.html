@@ -1,0 +1,14 @@
+{% extends "profile.html" %}
+{% load static %}
+
+{% block title %}My Addresses - WheelForge{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+// Auto-show addresses section on page load
+document.addEventListener("DOMContentLoaded", function() {
+    showSection('addresses');
+});
+</script>
+{% endblock %}
