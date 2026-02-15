@@ -184,3 +184,59 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 ACCOUNT_ADAPTER = 'core.adapters.CustomAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'
 
+
+# Logger
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "wheelforge.log"),
+            "formatter": "verbose",
+        },
+        "security_file": {
+            "level": "WARNING",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "security.log"),
+            "formatter": "verbose",
+        },
+    },
+
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+
+        "wheelforge": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+
+        "security": {
+            "handlers": ["console", "security_file"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+    },
+}

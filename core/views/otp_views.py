@@ -14,51 +14,69 @@ from accounts.models import OTPVerification
 
 User = get_user_model()
 
-@never_cache
 def verify_otp_view(request):
-    email = request.session.get('signup_email')
-    otp_session = request.session.get('signup_otp')
-    created_at = request.session.get('signup_otp_created_at')
 
-    if not email or not otp_session or not created_at:
-        messages.error(request, 'Session expired. Please sign up again.')
-        return redirect('signup')
-    
-    if timezone.now() > timezone.datetime.fromisoformat(created_at) + timezone.timedelta(minutes=5):
-        for key in list(request.session.keys()):
-            if key.startswith('signup_'):
-                request.session.pop(key, None)
-        messages.error(request, 'OTP expired. Please sign up again.')
-        return redirect('signup')
-    
-    if request.method == 'POST':
-        otp_input = request.POST.get('otp', '').strip()
+    user_id = request.session.get("otp_user_id")
+    purpose = request.session.get("otp_purpose")
 
-        if otp_input != otp_session:
-            messages.error(request, 'Invalid OTP.')
-            return redirect('verify_otp')
-        
-        user = User.objects.create_user(
-            username=email,
-            email=email,
-            password=request.session['signup_password'],
-            is_active=True
+    if not user_id or purpose != 'signup':
+        messages.error(request, "Session expired. Please sign up again.")
+        return redirect("signup")
+
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, "Invalid session.")
+        return redirect("signup")
+    
+    try:
+        otp_obj = OTPVerification.objects.filter(
+            user=user,
+            purpose='signup',
+            is_verified=False
+        ).latest("created_at")
+    except OTPVerification.DoesNotExist:
+        messages.error(request, "No OTP found.")
+        return redirect("signup")
+    
+    remaining_seconds = 0
+
+    if otp_obj.expires_at and otp_obj.expires_at > timezone.now():
+        remaining_seconds = int(
+            (otp_obj.expires_at - timezone.now()).total_seconds()
         )
 
-        OTPVerification.objects.filter(
-            purpose='signup',
-            otp=otp_session,
-            is_verified=False
-        ).update(is_verified=True)
+    if request.method == "POST":
+        otp_input = request.POST.get("otp", "").strip()
 
-        for key in list(request.session.keys()):
-            if key.startswith('signup_'):
-                request.session.pop(key, None)
+        
 
-        messages.success(request,"Account verified. You can now log in.")
+        #  Expiry check
+        if otp_obj.is_expired():
+            messages.error(request, "OTP expired.")
+            return redirect("signup")
+
+        #  OTP match
+        if otp_obj.otp != otp_input:
+            messages.error(request, "Invalid OTP.")
+            return redirect("verify_otp")
+
+        #  Mark verified
+        otp_obj.is_verified = True
+        otp_obj.save()
+
+        #  Activate user
+        user.is_active = True
+        user.save()
+
+        #  Clear session
+        request.session.pop('otp_user_id', None)
+        request.session.pop('otp_purpose', None)
+
+        messages.success(request, "Account verified. You can now log in.")
         return redirect("login")
 
-    return render(request, "verify_otp.html")
+    return render(request, "verify_otp.html", {"otp_remaining_seconds": remaining_seconds})
 
 @never_cache
 def resend_otp_view(request):

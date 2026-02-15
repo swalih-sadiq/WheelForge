@@ -1,31 +1,22 @@
-
 {% extends 'base_auth.html' %}
-
 
 {% block title %}Verify OTP - WheelForge{% endblock %}
 
-
 {% block extra_css %}
 <style>
-    /* Custom animations */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
-    .fade-in {
-        animation: fadeIn 0.6s ease-out;
-    }
+    .fade-in { animation: fadeIn 0.6s ease-out; }
+
     @keyframes pulse {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.5; }
     }
-    .pulse-animation {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
+    .pulse-animation { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
 </style>
 {% endblock %}
-
-
 
 {% block content %}
 
@@ -87,6 +78,26 @@
                     </p>
                 </div>
 
+
+                <!--  OTP TIMER BLOCK  -->
+                <div id="otp-timer-container" class="mb-6 text-center">
+                    <div class="text-sm text-slate-600 mb-2">
+                        OTP expires in:
+                    </div>
+
+                    <div id="otp-timer"
+                         data-remaining="{{ otp_remaining_seconds|default:0 }}"
+                         class="text-2xl font-bold text-blue-600">
+                        00:00
+                    </div>
+
+                    <div id="otp-expired-message"
+                         class="hidden mt-3 text-red-600 font-semibold">
+                        OTP expired. Please request a new one.
+                    </div>
+                </div>
+
+
                 <!-- OTP FORM -->
                 <form method="post" class="space-y-6">
                     {% csrf_token %}
@@ -105,6 +116,7 @@
 
                     <button
                         type="submit"
+                        id="verify-button"
                         class="w-full bg-slate-800 text-white px-6 py-4 rounded-lg
                                font-semibold hover:bg-slate-900 transition">
                         Verify & Continue
@@ -115,15 +127,15 @@
                 <div class="mt-8 pt-6 border-t border-slate-200 text-center">
                     <p class="text-sm text-slate-600 mb-3">Didn't receive the code?</p>
                     <a href="{% url 'resend_otp' %}"
+                       id="resend-link"
                        class="inline-flex items-center px-4 py-2 bg-white border
-                              border-slate-300 rounded-lg hover:bg-slate-50">
+                              border-slate-300 rounded-lg hover:bg-slate-50 opacity-50 pointer-events-none">
                         Resend OTP
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- Back -->
         <div class="text-center mt-6">
             <a href="{% url 'login' %}" class="text-slate-600 hover:text-slate-800 text-sm">
                 ← Back to Login
@@ -135,5 +147,56 @@
         </div>
     </div>
 </div>
+
+
+<!--  TIMER SCRIPT -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const timerElement = document.getElementById("otp-timer");
+    const expiredMessage = document.getElementById("otp-expired-message");
+    const submitButton = document.getElementById("verify-button");
+    const resendLink = document.getElementById("resend-link");
+
+    if (!timerElement) return;
+
+    let remaining = parseInt(timerElement.dataset.remaining);
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return (
+            String(minutes).padStart(2, '0') +
+            ":" +
+            String(secs).padStart(2, '0')
+        );
+    }
+
+    function updateTimer() {
+        if (remaining <= 0) {
+            timerElement.textContent = "00:00";
+            timerElement.classList.remove("text-blue-600");
+            timerElement.classList.add("text-red-600");
+
+            expiredMessage.classList.remove("hidden");
+
+            submitButton.disabled = true;
+            submitButton.classList.add("opacity-50", "cursor-not-allowed");
+
+            resendLink.classList.remove("opacity-50", "pointer-events-none");
+
+            clearInterval(interval);
+            return;
+        }
+
+        timerElement.textContent = formatTime(remaining);
+        remaining--;
+    }
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+});
+</script>
 
 {% endblock %}

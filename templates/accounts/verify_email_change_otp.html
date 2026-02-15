@@ -174,6 +174,26 @@
                     
                     <!-- Form Body -->
                     <div class="p-8">
+
+                        <!--  OTP TIMER -->
+                        <div class="mb-6 text-center">
+
+                            <p class="text-sm text-slate-600 mb-1">
+                                OTP expires in:
+                            </p>
+
+                            <div id="otp-timer"
+                                data-remaining="{{ otp_remaining_seconds|default:0 }}"
+                                class="text-2xl font-bold text-blue-600">
+                                00:00
+                            </div>
+
+                            <p id="otp-expired-message"
+                                class="hidden mt-2 text-red-600 font-semibold">
+                                OTP expired. Please request a new one.
+                            </p>
+
+                        </div>
                         
                         <!-- Success Icon and Message -->
                         <div class="mb-8 text-center">
@@ -240,6 +260,7 @@
                                 <p class="text-sm text-slate-600 mb-3">Didn't receive the code?</p>
                                 <a 
                                   href="{% url 'resend-email-change-otp' %}"
+                                  id="resend-link"
                                   class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
                                 >
                                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -268,6 +289,7 @@
                             <div class="pt-6 border-t border-slate-200 flex gap-3">
                                 <button 
                                     type="submit"
+                                    id="verify-button"
                                     class="flex-1 bg-slate-800 text-white px-6 py-3.5 rounded-lg font-semibold hover:bg-slate-900 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center"
                                 >
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,4 +322,57 @@
     </div>
     
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const timerElement = document.getElementById("otp-timer");
+    const expiredMessage = document.getElementById("otp-expired-message");
+    const submitButton = document.getElementById("verify-button");
+    const resendLink = document.getElementById("resend-link");
+
+    if (!timerElement) return;
+
+    let remaining = parseInt(timerElement.dataset.remaining);
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return (
+            String(minutes).padStart(2, '0') +
+            ":" +
+            String(secs).padStart(2, '0')
+        );
+    }
+
+    function updateTimer() {
+
+        if (remaining <= 0) {
+
+            timerElement.textContent = "00:00";
+            timerElement.classList.remove("text-blue-600");
+            timerElement.classList.add("text-red-600");
+
+            expiredMessage.classList.remove("hidden");
+
+            submitButton.disabled = true;
+            submitButton.classList.add("opacity-50", "cursor-not-allowed");
+
+            resendLink.classList.remove("opacity-50", "pointer-events-none");
+
+            clearInterval(interval);
+            return;
+        }
+
+        timerElement.textContent = formatTime(remaining);
+        remaining--;
+    }
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+});
+</script>
+
+
 {% endblock %}

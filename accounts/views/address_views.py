@@ -15,7 +15,9 @@ def address_list_view(request):
 
 @user_required
 def add_address_view(request):
+
     if request.method == "POST":
+
         has_addresses = Address.objects.filter(
             user=request.user
         ).exists()
@@ -90,7 +92,8 @@ def add_address_view(request):
         )
 
         messages.success(request, "Address added successfully.")
-        return redirect("address-list")
+        return redirect(f"{reverse('profile', kwargs={'uuid': request.user.uuid})}?section=addresses")
+
 
     return render(request, "accounts/add_address.html")
 

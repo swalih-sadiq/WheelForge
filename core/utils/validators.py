@@ -1,7 +1,7 @@
 import re
 
 
-FULL_NAME_REGEX = r'^[A-Za-z ]{2,50}$'
+FULL_NAME_REGEX = r'^[A-Za-z]+(?: [A-Za-z]+)*$'
 
 EMAIL_REGEX = r'^[\w\.-]+@[\w\.-]+\.\w+$'
 
@@ -54,7 +54,8 @@ def validate_phone(phone):
 def validate_signup_data(data):
     errors = {}
 
-    full_name_error = validate_full_name(data.get('full_name', '').strip())
+    full_name = data.get('full_name', '').strip()
+    full_name_error = validate_full_name(full_name)
     if full_name_error:
         errors['full_name'] = full_name_error
 
